@@ -21,7 +21,7 @@ def load_settings():
     """Read settings from the process environment."""
     origins = os.getenv(
         "CORS_ORIGINS",
-        "http://localhost:3000,http://localhost:5173",
+        "http://localhost:5173",
     )
     return {
         "ENVIRONMENT": os.getenv("FLASK_ENV", "development"),

@@ -18,6 +18,24 @@ def test_backend_health(client):
     assert response.get_json()["data"]["status"] == "healthy"
 
 
+def test_cors_allows_configured_frontend_origin(client):
+    response = client.get(
+        "/api/health",
+        headers={"Origin": "http://localhost:5173"},
+    )
+
+    assert response.headers["Access-Control-Allow-Origin"] == "http://localhost:5173"
+
+
+def test_cors_does_not_allow_unconfigured_origin(client):
+    response = client.get(
+        "/api/health",
+        headers={"Origin": "https://example.com"},
+    )
+
+    assert "Access-Control-Allow-Origin" not in response.headers
+
+
 def test_ollama_health_reports_available_model(client, monkeypatch):
     import requests
 

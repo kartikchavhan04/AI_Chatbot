@@ -35,12 +35,14 @@ def test_chat_generates_response_and_forwards_validated_history(client, monkeypa
     assert body["success"] is True
     assert body["data"]["conversation_id"] == "conversation-1"
     assert body["data"]["assistant_message"] == "Python is a programming language."
+    assert captured["url"] == "http://localhost:11434/api/chat"
     assert captured["body"]["model"] == "qwen3:8b"
     assert captured["body"]["stream"] is False
-    assert captured["body"]["messages"][-1] == {
-        "role": "user",
-        "content": "Explain Python",
-    }
+    assert captured["body"]["messages"] == [
+        {"role": "user", "content": "Hi"},
+        {"role": "assistant", "content": "Hello"},
+        {"role": "user", "content": "Explain Python"},
+    ]
     assert captured["timeout"] == 2
 
 
