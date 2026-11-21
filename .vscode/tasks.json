@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Clone chatbot_backend from Azure DevOps",
+			"type": "shell",
+			"command": "git.exe",
+			"args": [
+				"clone",
+				"https://dev.azure.com/justbytecoder/pgguru/_git/chatbot_backend",
+				"C:\\Webdev\\chatbot_backend",
+				"--progress"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check Git credential manager configuration",
+			"type": "shell",
+			"command": "Get-Command git-credential-manager -ErrorAction SilentlyContinue; git config --show-origin --get-all credential.helper",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Inspect Azure Repos credential commands",
+			"type": "shell",
+			"command": "git-credential-manager.exe",
+			"args": [
+				"azure-repos",
+				"--help"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

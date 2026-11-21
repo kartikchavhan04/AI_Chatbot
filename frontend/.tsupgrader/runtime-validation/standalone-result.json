@@ -1,0 +1,145 @@
+{
+  "planHash": "418c60adb1bc631d88f9ea47592627a6fdbe2d63440e3e218a314baab361da1d",
+  "phase": "standalone",
+  "recordedAtUtc": "2026-11-21T16:23:35.6608820Z",
+  "retryCount": 3,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "frontend-lint",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E local-ai-chatbot-frontend@1.0.0 lint\r\n\u003E eslint .\r\n\r\n",
+        "durationMs": 2483
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E local-ai-chatbot-frontend@1.0.0 test\r\n\u003E node --test\r\n\r\n\u25B6 conversation titles\r\n  \u2714 normalizes whitespace and keeps short prompts intact (0.4862ms)\r\n  \u2714 truncates long prompts to a readable title (0.116ms)\r\n\u2714 conversation titles (1.3317ms)\r\n\u25B6 API error messages\r\n  \u2714 uses the safe message returned by Flask (0.144ms)\r\n  \u2714 explains a network failure without leaking internals (0.1598ms)\r\n\u2714 API error messages (0.4416ms)\r\n\u2139 tests 4\r\n\u2139 suites 2\r\n\u2139 pass 4\r\n\u2139 fail 0\r\n\u2139 cancelled 0\r\n\u2139 skipped 0\r\n\u2139 todo 0\r\n\u2139 duration_ms 303.2859\r\n",
+        "durationMs": 791,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "frontend-production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E local-ai-chatbot-frontend@1.0.0 build\r\n\u003E vite build\r\n\r\n\u001B[36mvite v6.4.6 \u001B[32mbuilding for production...\u001B[36m\u001B[39m\r\ntransforming...\r\n\u001B[32m\u2713\u001B[39m 1649 modules transformed.\r\nrendering chunks...\r\ncomputing gzip size...\r\n\u001B[2mdist/\u001B[22m\u001B[32mindex.html                 \u001B[39m\u001B[1m\u001B[2m  0.57 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:  0.35 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/index-DZwVgZx3.css  \u001B[39m\u001B[1m\u001B[2m 27.22 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:  5.69 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/index-DbiLrlQl.js   \u001B[39m\u001B[1m\u001B[2m238.42 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip: 78.68 kB\u001B[22m\r\n\u001B[32m\u2713 built in 2.07s\u001B[39m\r\n",
+        "durationMs": 2941
+      },
+      {
+        "name": "frontend-dev-server-home",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml lang=\u0022en\u0022\u003E\r\n  \u003Chead\u003E\n    \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n    \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n    \u003Cmeta charset=\u0022UTF-8\u0022 /\u003E\r\n    \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0\u0022 /\u003E\r\n    \u003Cmeta\r\n      name=\u0022description\u0022\r\n      content=\u0022A private, locally powered AI chat experience.\u0022\r\n    /\u003E\r\n    \u003Cmeta name=\u0022theme-color\u0022 content=\u0022#f7f8fa\u0022 /\u003E\r\n    \u003Ctitle\u003ELocal AI \u2014 Chat\u003C/title\u003E\r\n  \u003C/head\u003E\r\n  \u003Cbody\u003E\r\n    \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\r\n    \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.jsx\u0022\u003E\u003C/script\u003E\r\n  \u003C/body\u003E\r\n\u003C/html\u003E\r\n",
+        "durationMs": 9
+      }
+    ],
+    "executions": [
+      {
+        "source": "devServer",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev",
+          "--",
+          "--host",
+          "localhost",
+          "--port",
+          "5174",
+          "--strictPort"
+        ],
+        "cwd": "C:\\Webdev\\AI-CHATBOT\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "frontend-lint",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "lint"
+        ],
+        "cwd": "C:\\Webdev\\AI-CHATBOT\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\Webdev\\AI-CHATBOT\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "frontend-production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Webdev\\AI-CHATBOT\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "frontend-dev-server-home",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev",
+          "--",
+          "--host",
+          "localhost",
+          "--port",
+          "5174",
+          "--strictPort"
+        ],
+        "cwd": "C:\\Webdev\\AI-CHATBOT\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}
