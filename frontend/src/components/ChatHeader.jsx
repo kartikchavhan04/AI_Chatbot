@@ -9,6 +9,9 @@ export default function ChatHeader({
   conversationTitle,
   onClear,
   onOpenSidebar,
+  availableModels,
+  selectedModel,
+  onSelectModel,
 }) {
   const { theme, toggleTheme } = useTheme();
 
@@ -39,6 +42,19 @@ export default function ChatHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+        {availableModels.length > 0 && (
+          <select
+            value={selectedModel}
+            onChange={(event) => onSelectModel(event.target.value)}
+            className="hidden max-w-36 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 outline-none focus:border-indigo-400 sm:block dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            aria-label="Select Ollama model"
+            title="Select Ollama model"
+          >
+            {availableModels.map((model) => (
+              <option key={model} value={model}>{model}</option>
+            ))}
+          </select>
+        )}
         <div className="hidden items-center gap-4 sm:flex">
           <ConnectionStatus label="Backend" status={backendStatus} />
           <ConnectionStatus label="Ollama" status={ollamaStatus} />

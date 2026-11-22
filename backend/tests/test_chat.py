@@ -109,3 +109,20 @@ def test_chat_maps_timeout(client, monkeypatch):
 
     assert response.status_code == 504
     assert response.get_json()["error"]["code"] == "ollama_timeout"
+
+
+def test_chat_accepts_selected_model(client, monkeypatch):
+    captured = {}
+
+    def fake_post(url, json, timeout):
+        captured.update(body=json)
+        return FakeResponse({"message": {"content": "Selected model response."}})
+
+    monkeypatch.setattr(requests, "post", fake_post)
+    response = client.post(
+        "/api/chat",
+        json={"message": "Hello", "model": "llama3:latest"},
+    )
+
+    assert response.status_code == 200
+    assert captured["body"]["model"] == "llama3:latest"

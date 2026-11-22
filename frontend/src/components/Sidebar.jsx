@@ -2,12 +2,16 @@ import {
   Bot,
   ChevronLeft,
   ChevronRight,
+  Download,
   MessageSquare,
+  Pencil,
   Plus,
+  Search,
   Sparkles,
   Trash2,
   X,
 } from "lucide-react";
+import { useState } from "react";
 import { formatConversationDate } from "../utils/helpers.js";
 
 export default function Sidebar({
@@ -20,8 +24,16 @@ export default function Sidebar({
   onNewChat,
   onSelect,
   onDelete,
+  onRename,
+  onDeleteAll,
 }) {
-  const groupedConversations = conversations.reduce((groups, conversation) => {
+  const [search, setSearch] = useState("");
+  const filteredConversations = conversations.filter((conversation) =>
+    `${conversation.title} ${conversation.messages.map((message) => message.content).join(" ")}`
+      .toLowerCase()
+      .includes(search.trim().toLowerCase()),
+  );
+  const groupedConversations = filteredConversations.reduce((groups, conversation) => {
     const label = formatConversationDate(conversation.updatedAt || conversation.createdAt);
     groups[label] = [...(groups[label] || []), conversation];
     return groups;
@@ -91,6 +103,55 @@ export default function Sidebar({
           </button>
         </div>
 
+        {!collapsed && (
+          <div className="mt-3 px-4">
+            <label className="relative block">
+              <Search
+                size={14}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search conversations"
+                className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-indigo-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+              />
+            </label>
+            {conversations.length > 0 && (
+              <div className="mt-2 flex justify-end gap-1">
+                <button
+                  onClick={() => {
+                    const blob = new Blob([JSON.stringify(conversations, null, 2)], {
+                      type: "application/json",
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = "local-ai-conversations.json";
+                    link.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+                  title="Export conversations"
+                  aria-label="Export conversations"
+                >
+                  <Download size={14} />
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm("Delete all conversations?")) onDeleteAll();
+                  }}
+                  className="rounded-md p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950"
+                  title="Delete all conversations"
+                  aria-label="Delete all conversations"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div
           className={`mt-8 min-h-0 flex-1 overflow-y-auto ${
             collapsed ? "px-2 lg:px-2" : "px-3"
@@ -139,6 +200,19 @@ export default function Sidebar({
                         <span className={`truncate ${collapsed ? "lg:hidden" : ""}`}>
                           {conversation.title}
                         </span>
+                      </button>
+                      <button
+                        className={`rounded-md p-1.5 text-slate-400 opacity-0 transition hover:bg-white hover:text-indigo-600 group-hover:opacity-100 focus:opacity-100 dark:hover:bg-slate-700 ${
+                          collapsed ? "lg:hidden" : ""
+                        }`}
+                        onClick={() => {
+                          const title = window.prompt("Conversation name", conversation.title);
+                          if (title) onRename(conversation.id, title);
+                        }}
+                        aria-label={`Rename ${conversation.title}`}
+                        title="Rename chat"
+                      >
+                        <Pencil size={14} />
                       </button>
                       <button
                         className={`mr-1 rounded-md p-1.5 text-slate-400 opacity-0 transition hover:bg-white hover:text-rose-600 group-hover:opacity-100 focus:opacity-100 dark:hover:bg-slate-700 ${

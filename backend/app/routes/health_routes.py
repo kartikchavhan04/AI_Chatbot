@@ -2,7 +2,7 @@
 
 from flask import Blueprint, current_app
 
-from app.services.ollama_service import check_model_available
+from app.services.ollama_service import check_model_available, list_available_models
 from app.utils.response_handler import success_response
 
 health_bp = Blueprint("health", __name__)
@@ -29,4 +29,18 @@ def ollama_health():
             "model": model_status["model"],
         },
         "Ollama and the configured model are available.",
+    )
+
+
+@health_bp.get("/ollama/models")
+def ollama_models():
+    """List models installed in local Ollama."""
+    names = list_available_models(current_app.config)
+    return success_response(
+        {
+            "status": "healthy",
+            "models": names,
+            "selected": current_app.config["OLLAMA_MODEL"],
+        },
+        "Ollama models retrieved successfully.",
     )

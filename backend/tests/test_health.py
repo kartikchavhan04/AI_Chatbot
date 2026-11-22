@@ -39,19 +39,23 @@ def test_cors_does_not_allow_unconfigured_origin(client):
 def test_ollama_health_reports_available_model(client, monkeypatch):
     import requests
 
-    monkeypatch.setattr(
-        requests,
-        "get",
-        lambda *args, **kwargs: FakeResponse(
-            {"models": [{"name": "qwen3:8b"}]}
-        ),
-    )
+    captured = {}
+
+    def fake_get(url, timeout):
+        captured.update(url=url, timeout=timeout)
+        return FakeResponse({"models": [{"name": "qwen3:8b"}]})
+
+    monkeypatch.setattr(requests, "get", fake_get)
 
     response = client.get("/api/health/ollama")
 
     assert response.status_code == 200
     assert response.get_json()["data"]["model_available"] is True
     assert response.get_json()["data"]["model"] == "qwen3:8b"
+    assert captured == {
+        "url": "http://localhost:11434/api/tags",
+        "timeout": 2,
+    }
 
 
 def test_ollama_health_reports_missing_model(client, monkeypatch):

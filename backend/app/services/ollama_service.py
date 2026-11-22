@@ -1,6 +1,7 @@
 """Ollama REST API integration."""
 
 import requests
+import json
 
 
 class OllamaServiceError(Exception):
@@ -71,12 +72,60 @@ def check_model_available(config):
     return {"model": model_name}
 
 
+def list_available_models(config):
+    """Return installed Ollama model names."""
+    names = _get_models(config)
+    return sorted(set(names))
+
+
+def stream_chat_response(payload, config):
+    """Stream text chunks from Ollama as server-sent events."""
+    messages = list(payload["history"])
+    messages.append({"role": "user", "content": payload["message"]})
+    model = payload.get("model") or config["OLLAMA_MODEL"]
+    request_body = {
+        "model": model,
+        "messages": messages,
+        "stream": True,
+    }
+
+    try:
+        response = requests.post(
+            f"{_base_url(config)}/api/chat",
+            json=request_body,
+            timeout=_timeout(config),
+            stream=True,
+        )
+    except requests.Timeout as error:
+        raise OllamaTimeout("Ollama request timed out.") from error
+    except requests.RequestException as error:
+        raise OllamaUnavailable("Ollama is unavailable.") from error
+
+    if response.status_code == 404:
+        raise OllamaModelNotFound("The configured Ollama model is not installed.")
+    if not response.ok:
+        raise OllamaUnavailable("Ollama could not process the chat request.")
+
+    try:
+        for line in response.iter_lines(decode_unicode=True):
+            if not line:
+                continue
+            body = json.loads(line)
+            content = body.get("message", {}).get("content", "")
+            if content:
+                yield content
+            if body.get("done") is True:
+                break
+    except (ValueError, TypeError) as error:
+        raise OllamaInvalidResponse("Ollama returned an invalid response.") from error
+
+
 def generate_chat_response(payload, config):
     """Send validated conversation messages to Ollama and return its text."""
     messages = list(payload["history"])
     messages.append({"role": "user", "content": payload["message"]})
     request_body = {
-        "model": config["OLLAMA_MODEL"],
+        "model": payload.get("model") or config["OLLAMA_MODEL"],
         "messages": messages,
         "stream": False,
     }

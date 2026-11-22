@@ -10,7 +10,7 @@ def validate_chat_payload(payload, max_message_length, max_history_messages):
     if not isinstance(payload, dict):
         raise ApiError("The JSON body must be an object.")
 
-    allowed_fields = {"message", "conversation_id", "history"}
+    allowed_fields = {"message", "conversation_id", "history", "model"}
     if set(payload) - allowed_fields:
         raise ApiError("The request contains unsupported fields.")
 
@@ -66,8 +66,15 @@ def validate_chat_payload(payload, max_message_length, max_history_messages):
             )
         validated_history.append({"role": role, "content": content})
 
+    model = payload.get("model")
+    if model is not None:
+        if not isinstance(model, str) or not model.strip() or len(model.strip()) > 128:
+            raise ApiError("model must be a non-empty string of at most 128 characters.")
+        model = model.strip()
+
     return {
         "message": message,
         "conversation_id": conversation_id,
         "history": validated_history,
+        "model": model,
     }

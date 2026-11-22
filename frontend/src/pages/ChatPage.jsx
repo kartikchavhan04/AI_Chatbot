@@ -8,6 +8,7 @@ import {
   getApiErrorMessage,
   getBackendHealth,
   getOllamaHealth,
+  getAvailableModels,
 } from "../services/chatService.js";
 import useChat from "../hooks/useChat.js";
 
@@ -23,6 +24,8 @@ export default function ChatPage() {
   const [backendStatus, setBackendStatus] = useState("checking");
   const [ollamaStatus, setOllamaStatus] = useState("checking");
   const [connectionMessage, setConnectionMessage] = useState("");
+  const [availableModels, setAvailableModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState("");
   const chat = useChat();
 
   const messages = chat.activeConversation?.messages || [];
@@ -48,6 +51,15 @@ export default function ChatPage() {
 
   useEffect(() => {
     checkConnections();
+    getAvailableModels()
+      .then((result) => {
+        const models = result?.data?.models || [];
+        setAvailableModels(models);
+        setSelectedModel(result?.data?.selected || models[0] || "");
+      })
+      .catch(() => {
+        setAvailableModels([]);
+      });
     const intervalId = window.setInterval(checkConnections, 30_000);
     return () => window.clearInterval(intervalId);
   }, [checkConnections]);
@@ -64,7 +76,7 @@ export default function ChatPage() {
   }, [backendStatus, connectionMessage, ollamaStatus]);
 
   async function handleSend(message) {
-    await chat.sendMessage(message);
+    await chat.sendMessage(message, selectedModel);
   }
 
   return (
@@ -79,6 +91,8 @@ export default function ChatPage() {
         onNewChat={chat.startNewChat}
         onSelect={chat.selectConversation}
         onDelete={chat.deleteConversation}
+        onRename={chat.renameConversation}
+        onDeleteAll={chat.deleteAllConversations}
       />
 
       <section className="flex min-w-0 flex-1 flex-col bg-white dark:bg-slate-950">
@@ -89,6 +103,9 @@ export default function ChatPage() {
           conversationTitle={chat.activeConversation?.title}
           onClear={chat.clearActiveConversation}
           onOpenSidebar={() => setMobileSidebarOpen(true)}
+          availableModels={availableModels}
+          selectedModel={selectedModel}
+          onSelectModel={setSelectedModel}
         />
 
         <div className="relative flex min-h-0 flex-1 flex-col">
@@ -116,7 +133,7 @@ export default function ChatPage() {
             messages={messages}
             isGenerating={chat.isGenerating}
             onSuggestion={handleSend}
-            onRegenerate={chat.regenerateLastResponse}
+            onRegenerate={() => chat.regenerateLastResponse(selectedModel)}
           />
 
           {chat.error && (
@@ -138,7 +155,11 @@ export default function ChatPage() {
           )}
         </div>
 
-        <ChatInput onSend={handleSend} isGenerating={chat.isGenerating} />
+        <ChatInput
+          onSend={handleSend}
+          isGenerating={chat.isGenerating}
+          onStop={chat.stopGenerating}
+        />
       </section>
     </main>
   );

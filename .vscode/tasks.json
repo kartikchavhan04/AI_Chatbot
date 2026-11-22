@@ -31,6 +31,131 @@
 			],
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "Run backend pytest",
+			"type": "shell",
+			"command": "C:\\Webdev\\AI-CHATBOT\\backend\\.venv\\Scripts\\python.exe",
+			"args": [
+				"-m",
+				"pytest",
+				"-q"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Validate frontend build",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"--prefix",
+				"C:\\Webdev\\AI-CHATBOT\\frontend",
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Validate frontend lint",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"--prefix",
+				"C:\\Webdev\\AI-CHATBOT\\frontend",
+				"run",
+				"lint"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Validate frontend tests",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"--prefix",
+				"C:\\Webdev\\AI-CHATBOT\\frontend",
+				"test"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Validate backend tests",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/d",
+				"/s",
+				"/c",
+				"cd /d C:\\Webdev\\AI-CHATBOT\\backend && python -m pytest -q"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run backend pytest final",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-c",
+				"import os, sys, pytest; os.chdir(r'C:\\Webdev\\AI-CHATBOT\\backend'); sys.path.insert(0, r'C:\\Webdev\\AI-CHATBOT\\backend'); raise SystemExit(pytest.main(['-q','tests']))"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run backend pytest final 2",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-c",
+				"import os,sys,pytest; os.chdir('C:/Webdev/AI-CHATBOT/backend'); sys.path.insert(0,'C:/Webdev/AI-CHATBOT/backend'); raise SystemExit(pytest.main(['-q','tests']))"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run backend pytest simple",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-m",
+				"pytest",
+				"-q",
+				"C:\\Webdev\\AI-CHATBOT\\backend\\tests"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install backend validation dependencies",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-m",
+				"pip",
+				"install",
+				"-r",
+				"C:\\Webdev\\AI-CHATBOT\\backend\\requirements.txt"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run backend pytest installed",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-m",
+				"pytest",
+				"-q",
+				"C:\\Webdev\\AI-CHATBOT\\backend\\tests"
+			],
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }

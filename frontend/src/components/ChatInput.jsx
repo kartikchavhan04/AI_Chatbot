@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, LoaderCircle, ShieldCheck } from "lucide-react";
+import { ArrowUp, FileText, Mic, ShieldCheck, Square } from "lucide-react";
 import { MAX_MESSAGE_LENGTH } from "../utils/helpers.js";
 
-export default function ChatInput({ onSend, isGenerating }) {
+export default function ChatInput({ onSend, isGenerating, onStop }) {
   const [value, setValue] = useState("");
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [documentContext, setDocumentContext] = useState("");
+  const [documentName, setDocumentName] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
   const canSend = value.trim().length > 0 && !isGenerating;
 
   useEffect(() => {
@@ -16,8 +21,14 @@ export default function ChatInput({ onSend, isGenerating }) {
 
   function submit() {
     if (!canSend) return;
-    onSend(value);
+    const documentPrefix = documentContext
+      ? `Document: ${documentName}\n${documentContext}\n\nQuestion:\n`
+      : "";
+    const availableQuestionLength = Math.max(0, MAX_MESSAGE_LENGTH - documentPrefix.length);
+    onSend(`${documentPrefix}${value.slice(0, availableQuestionLength)}`);
     setValue("");
+    setDocumentContext("");
+    setDocumentName("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
   }
 
@@ -26,6 +37,50 @@ export default function ChatInput({ onSend, isGenerating }) {
       event.preventDefault();
       submit();
     }
+  }
+
+  function handleDocument(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!/\.(txt|md|csv|json)$/i.test(file.name)) {
+      setDocumentName("Unsupported file");
+      setDocumentContext("");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result || "").replace(/\r/g, "").slice(0, 3000);
+      setDocumentName(file.name);
+      setDocumentContext(text);
+    };
+    reader.readAsText(file);
+  }
+
+  function toggleVoice() {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "mr-IN";
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript || "";
+      setValue((current) => `${current}${transcript}`.slice(0, MAX_MESSAGE_LENGTH));
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognitionRef.current = recognition;
+    setIsListening(true);
+    recognition.start();
   }
 
   return (
@@ -49,8 +104,40 @@ export default function ChatInput({ onSend, isGenerating }) {
           />
           <div className="flex items-center justify-between px-3 pb-2.5">
             <div className="pl-1 text-[11px] text-slate-400">
-              <span className="hidden sm:inline">Enter to send · Shift + Enter for a new line</span>
-              <span className="sm:hidden">Your local assistant</span>
+              <div className="flex items-center gap-1">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".txt,.md,.csv,.json,text/plain,text/markdown"
+                  onChange={handleDocument}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+                  title="Attach text document"
+                  aria-label="Attach text document"
+                >
+                  <FileText size={14} />
+                </button>
+                {(window.SpeechRecognition || window.webkitSpeechRecognition) && (
+                  <button
+                    type="button"
+                    onClick={toggleVoice}
+                    className={`rounded-md p-1.5 ${isListening ? "bg-rose-100 text-rose-600" : "text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"}`}
+                    title={isListening ? "Stop voice input" : "Start voice input"}
+                    aria-label={isListening ? "Stop voice input" : "Start voice input"}
+                  >
+                    <Mic size={14} />
+                  </button>
+                )}
+                {documentName && (
+                  <span className="ml-1 max-w-28 truncate text-[10px] text-indigo-500" title={documentName}>
+                    {documentName}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-3">
               {value.length > 0 && (
@@ -66,14 +153,14 @@ export default function ChatInput({ onSend, isGenerating }) {
                 </span>
               )}
               <button
-                onClick={submit}
-                disabled={!canSend}
+                onClick={isGenerating ? onStop : submit}
+                disabled={isGenerating ? false : !canSend}
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-800 dark:disabled:text-slate-600"
-                aria-label={isGenerating ? "Assistant is responding" : "Send message"}
-                title="Send message"
+                aria-label={isGenerating ? "Stop generating" : "Send message"}
+                title={isGenerating ? "Stop generating" : "Send message"}
               >
                 {isGenerating ? (
-                  <LoaderCircle size={17} className="animate-spin" />
+                  <Square size={15} fill="currentColor" />
                 ) : (
                   <ArrowUp size={18} strokeWidth={2.2} />
                 )}
